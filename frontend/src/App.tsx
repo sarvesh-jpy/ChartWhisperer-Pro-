@@ -1,4 +1,5 @@
-import { useState, ChangeEvent, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import type { ChangeEvent } from 'react';
 import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
 
