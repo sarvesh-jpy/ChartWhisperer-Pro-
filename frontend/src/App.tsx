@@ -57,7 +57,7 @@ function App() {
 
     try {
       // Example (Use your REAL Render URL)
-const response = await axios.post("https://chart-whisperer-pro.onrender.com/analyze", formData);
+const response = await axios.post("https://chartwhisperer-pro.onrender.com/analyze", formData);
       const resultText = response.data.analysis;
       setAnalysis(resultText);
       
