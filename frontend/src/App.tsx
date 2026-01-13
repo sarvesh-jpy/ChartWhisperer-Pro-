@@ -56,7 +56,8 @@ function App() {
     formData.append("strategy", strategy); // Sending your strategy to Python
 
     try {
-      const response = await axios.post("http://127.0.0.1:8000/analyze", formData);
+      // Example (Use your REAL Render URL)
+const response = await axios.post("https://chart-whisperer-pro.onrender.com/analyze", formData);
       const resultText = response.data.analysis;
       setAnalysis(resultText);
       
