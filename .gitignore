@@ -1,0 +1,8 @@
+.# Ignore python secrets
+backend/.env
+__pycache__/
+*.pyc
+
+# Ignore node modules (too big)
+frontend/node_modules/
+backend/venv/
