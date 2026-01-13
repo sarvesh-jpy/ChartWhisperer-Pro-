@@ -55,7 +55,7 @@ function App() {
 
     try {
       // ⚠️ USING LOCALHOST FOR TESTING
-      const response = await axios.post("https://chartwhisperer-pro.onrender.com", formData);
+      const response = await axios.post("https://chartwhisperer-pro.onrender.com/analyze", formData);
       const resultText = response.data.analysis;
       setAnalysis(resultText);
       speakText(resultText.replace(/[*#]/g, '')); 
@@ -79,7 +79,7 @@ function App() {
         analysis_text: analysis
     };
     try {
-        await axios.post("http://127.0.0.1:8000/save", payload);
+        await axios.post("https://chartwhisperer-pro.onrender.com/save", payload);
         alert("✅ Saved to Journal & Sent to Telegram!");
     } catch (error) {
         alert("❌ Failed to save.");
