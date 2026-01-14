@@ -36,8 +36,8 @@ class JournalEntry(BaseModel):
     pair: str
     bias: str
     entry: str
-    stop_loss: str
-    take_profit: str
+    stop_loss: int
+    take_profit: int
     analysis_text: str
 
 def send_telegram_alert(entry: JournalEntry):
