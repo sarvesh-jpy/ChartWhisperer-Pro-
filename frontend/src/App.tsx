@@ -75,32 +75,32 @@ function App() {
     }
   };
 
-  // --- 3. SAVE & ALERT FUNCTION (Smart Regex Extraction) ---
-  // ... inside App function ...
-
-  // ... inside App function ...
-
+  
   const handleSaveAndAlert = async () => {
     if (!analysis) return;
     setSaving(true);
 
-    // 1. ROBUST EXTRACTOR: Works for single-line AND multi-line AI output
+    // Helper: Finds the number after the keyword
     const extractValue = (text: string, label: string) => {
-      // Logic: Find "Label:" -> Capture text -> Stop when you hit " SL:" or " TP:" or Newline
-      // This regex looks for the Label, then grabs everything until the next "Keyword:" or End of line
-      const regex = new RegExp(`${label}[:\\*\\-]*\\s*(.*?)(?=\\s(?:SL|TP|ANALYSIS|ENTRY|BIAS|PAIR)[:\\*\\-]|\\n|$)`, "i");
-      
+      // Looks for Label: (space) Number
+      const regex = new RegExp(`${label}:\\s*([\\d\\.,]+)`, "i"); 
       const match = text.match(regex);
-      // Remove any leftover stars (*) or markdown symbols from the result
-      return match ? match[1].replace(/[*_]/g, '').trim() : "N/A";
+      return match ? match[1] : "N/A";
     };
 
-    // 2. Extract values using the new logic
+    // Grab values
     const realEntry = extractValue(analysis, "ENTRY");
     const realSL = extractValue(analysis, "SL");
     const realTP = extractValue(analysis, "TP");
-    const realPair = extractValue(analysis, "PAIR") || "XAU/USD";
-    const realBias = extractValue(analysis, "BIAS") || "Neutral";
+    
+    // For Pair and Bias, we grab the whole word
+    const extractWord = (text: string, label: string) => {
+       const regex = new RegExp(`${label}:\\s*([a-zA-Z/]+)`, "i");
+       const match = text.match(regex);
+       return match ? match[1] : "N/A";
+    }
+    const realPair = extractWord(analysis, "PAIR");
+    const realBias = extractWord(analysis, "BIAS");
 
     const payload = {
         pair: realPair, 
@@ -113,10 +113,8 @@ function App() {
 
     try {
         await axios.post("https://chartwhisperer-pro.onrender.com/save", payload);
-        // Popup to confirm what we sent (for your peace of mind)
-        alert(`✅ Sent to Telegram!\n\nEntry: ${realEntry}\nSL: ${realSL}\nTP: ${realTP}`);
+        alert(`✅ Sent to Telegram!\n\nE: ${realEntry}\nSL: ${realSL}\nTP: ${realTP}`);
     } catch (error) {
-        console.error(error);
         alert("❌ Failed to save.");
     } finally {
         setSaving(false);

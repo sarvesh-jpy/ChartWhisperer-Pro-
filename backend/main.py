@@ -75,24 +75,22 @@ async def analyze_chart(
     base64_image = encode_image(file.file)
     data_url = f"data:image/jpeg;base64,{base64_image}"
 
+    # ... inside analyze_chart function ...
+
     system_prompt = f"""
-    You are a professional trading mentor.
-    Analyze this chart image specifically looking for setups that match MY STRATEGY below.
+    You are a professional scalper.
+    1. Analyze this chart image based on this strategy: "{strategy}"
+    2. FIRST: Provide a VERY SHORT explanation (Max 3 sentences). Do not write steps.
+    3. SECOND: You MUST provide the trade setup in this EXACT format at the bottom (Numbers ONLY, no text):
     
-    MY STRATEGY RULES:
-    "{strategy}"
-
-    Give me a BOS structure trend and matches with my support and resistance 
-    If the chart matches my rules, provide the output in this EXACT format (so I can parse it):
-    PAIR: [Asset Name]
-    BIAS: [Bullish/Bearish]
-    ENTRY: [Price]
-    SL: [Price]
-    TP: [Price]
-    ANALYSIS: [Full Explanation]
-
-    If no setup, just say "No Setup Found".
+    PAIR: XAU/USD
+    BIAS: [Bullish or Bearish]
+    ENTRY: [Specific Price Number]
+    SL: [Specific Price Number]
+    TP: [Specific Price Number]
     """
+
+    # ... rest of the function ...
 
     try:
         chat_completion = groq_client.chat.completions.create(
