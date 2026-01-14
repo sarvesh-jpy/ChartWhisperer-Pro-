@@ -67,27 +67,47 @@ function App() {
     }
   };
 
+  // ... inside App function ...
+
   const handleSaveAndAlert = async () => {
     if (!analysis) return;
     setSaving(true);
+
+    // 1. Helper function to find text between two words
+    const extractValue = (text: string, label: string) => {
+      const regex = new RegExp(`${label}:\\s*(.*?)(?=\\n|$)`, "i");
+      const match = text.match(regex);
+      return match ? match[1].trim() : "N/A";
+    };
+
+    // 2. Extract the Real Numbers from the AI text
+    // (Matches the "ENTRY:", "SL:", "TP:" format from your System Prompt)
+    const realEntry = extractValue(analysis, "ENTRY");
+    const realSL = extractValue(analysis, "SL");
+    const realTP = extractValue(analysis, "TP");
+    const realPair = extractValue(analysis, "PAIR") || "XAU/USD";
+    const realBias = extractValue(analysis, "BIAS") || "Neutral";
+
     const payload = {
-        pair: "XAU/USD", 
-        bias: analysis.includes("Bullish") ? "Bullish" : "Bearish",
-        entry: "See Analysis",
-        stop_loss: "See Analysis",
-        take_profit: "See Analysis",
+        pair: realPair, 
+        bias: realBias,
+        entry: realEntry,         // <--- Now sends "2024.50" instead of "See Analysis"
+        stop_loss: realSL,        // <--- Now sends "2020.00"
+        take_profit: realTP,      // <--- Now sends "2030.00"
         analysis_text: analysis
     };
+
     try {
+        // Use your RENDER URL here
         await axios.post("https://chartwhisperer-pro.onrender.com/save", payload);
-        alert("✅ Saved to Journal & Sent to Telegram!");
+        alert("✅ Sent Real Numbers to Telegram!");
     } catch (error) {
+        console.error(error);
         alert("❌ Failed to save.");
     } finally {
         setSaving(false);
     }
-  };
-
+};
   return (
     <div className="min-h-screen bg-gray-900 text-white p-6 font-sans">
       <div className="max-w-6xl mx-auto">
