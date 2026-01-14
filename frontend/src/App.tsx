@@ -78,50 +78,46 @@ function App() {
   // --- 3. SAVE & ALERT FUNCTION (Smart Regex Extraction) ---
   // ... inside App function ...
 
+  // ... inside App function ...
+
   const handleSaveAndAlert = async () => {
     if (!analysis) return;
     setSaving(true);
 
-    // IMPROVED HELPER: Handles bolding (**ENTRY**) and case sensitivity
+    // 1. ROBUST EXTRACTOR: Works for single-line AND multi-line AI output
     const extractValue = (text: string, label: string) => {
-      // Regex explanation:
-      // 1. (?:^|\n|[\*\s])  -> Start of line, newline, or star/space (to avoid partial matches)
-      // 2. \**?             -> Optional starting bold stars (**)
-      // 3. ${label}         -> The word we look for (e.g., ENTRY)
-      // 4. \**?             -> Optional ending bold stars (**)
-      // 5. [:]?             -> Optional colon
-      // 6. \s* -> Any amount of whitespace
-      // 7. (.*?)            -> CAPTURE THIS: The actual value
-      // 8. (?=\n|$)         -> Stop at the next new line or end of string
-      const regex = new RegExp(`(?:^|\\n|[\\*\\s])\\**${label}\\**[:]\\s*(.*?)(?=\\n|$)`, "i");
+      // Logic: Find "Label:" -> Capture text -> Stop when you hit " SL:" or " TP:" or Newline
+      // This regex looks for the Label, then grabs everything until the next "Keyword:" or End of line
+      const regex = new RegExp(`${label}[:\\*\\-]*\\s*(.*?)(?=\\s(?:SL|TP|ANALYSIS|ENTRY|BIAS|PAIR)[:\\*\\-]|\\n|$)`, "i");
       
       const match = text.match(regex);
-      return match ? match[1].trim().replace(/\*\*/g, '') : "N/A";
+      // Remove any leftover stars (*) or markdown symbols from the result
+      return match ? match[1].replace(/[*_]/g, '').trim() : "N/A";
     };
 
-    // Extract values more reliably
+    // 2. Extract values using the new logic
     const realEntry = extractValue(analysis, "ENTRY");
     const realSL = extractValue(analysis, "SL");
     const realTP = extractValue(analysis, "TP");
-    
-    // Fallback logic: If regex fails, send a default message so it doesn't crash
+    const realPair = extractValue(analysis, "PAIR") || "XAU/USD";
+    const realBias = extractValue(analysis, "BIAS") || "Neutral";
+
     const payload = {
-        pair: extractValue(analysis, "PAIR") || "XAU/USD", 
-        bias: extractValue(analysis, "BIAS") || "Neutral",
-        entry: realEntry !== "N/A" ? realEntry : "See Chart", 
-        stop_loss: realSL !== "N/A" ? realSL : "See Chart",
-        take_profit: realTP !== "N/A" ? realTP : "See Chart",
+        pair: realPair, 
+        bias: realBias,
+        entry: realEntry, 
+        stop_loss: realSL,
+        take_profit: realTP,
         analysis_text: analysis
     };
 
-    console.log("Sending Payload:", payload); // Debugging: Check console to see what is being sent
-
     try {
         await axios.post("https://chartwhisperer-pro.onrender.com/save", payload);
-        alert(`✅ Sent to Telegram!\nEntry: ${payload.entry}\nTP: ${payload.take_profit}`);
+        // Popup to confirm what we sent (for your peace of mind)
+        alert(`✅ Sent to Telegram!\n\nEntry: ${realEntry}\nSL: ${realSL}\nTP: ${realTP}`);
     } catch (error) {
         console.error(error);
-        alert("❌ Failed to save. Check the Console (F12) for the exact error.");
+        alert("❌ Failed to save.");
     } finally {
         setSaving(false);
     }
