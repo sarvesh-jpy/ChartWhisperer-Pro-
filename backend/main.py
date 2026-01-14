@@ -35,9 +35,9 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY) if SUPABASE_URL els
 class JournalEntry(BaseModel):
     pair: str
     bias: str
-    entry: int
-    stop_loss: int
-    take_profit: int
+    entry: str
+    stop_loss: str
+    take_profit: str
     analysis_text: str
 
 def send_telegram_alert(entry: JournalEntry):
