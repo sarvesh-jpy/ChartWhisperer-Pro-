@@ -76,40 +76,52 @@ function App() {
   };
 
   // --- 3. SAVE & ALERT FUNCTION (Smart Regex Extraction) ---
+  // ... inside App function ...
+
   const handleSaveAndAlert = async () => {
     if (!analysis) return;
     setSaving(true);
 
-    // Helper: Finds text between a Label and the next Line/Comma
+    // IMPROVED HELPER: Handles bolding (**ENTRY**) and case sensitivity
     const extractValue = (text: string, label: string) => {
-      // Regex looks for "Label:" followed by any text until a newline
-      const regex = new RegExp(`${label}:\\s*(.*?)(?=\\n|$)`, "i");
+      // Regex explanation:
+      // 1. (?:^|\n|[\*\s])  -> Start of line, newline, or star/space (to avoid partial matches)
+      // 2. \**?             -> Optional starting bold stars (**)
+      // 3. ${label}         -> The word we look for (e.g., ENTRY)
+      // 4. \**?             -> Optional ending bold stars (**)
+      // 5. [:]?             -> Optional colon
+      // 6. \s* -> Any amount of whitespace
+      // 7. (.*?)            -> CAPTURE THIS: The actual value
+      // 8. (?=\n|$)         -> Stop at the next new line or end of string
+      const regex = new RegExp(`(?:^|\\n|[\\*\\s])\\**${label}\\**[:]\\s*(.*?)(?=\\n|$)`, "i");
+      
       const match = text.match(regex);
-      return match ? match[1].trim() : "N/A";
+      return match ? match[1].trim().replace(/\*\*/g, '') : "N/A";
     };
 
-    // Extract real numbers from the AI text
+    // Extract values more reliably
     const realEntry = extractValue(analysis, "ENTRY");
     const realSL = extractValue(analysis, "SL");
     const realTP = extractValue(analysis, "TP");
-    const realPair = extractValue(analysis, "PAIR") || "XAU/USD";
-    const realBias = extractValue(analysis, "BIAS") || "Neutral";
-
+    
+    // Fallback logic: If regex fails, send a default message so it doesn't crash
     const payload = {
-        pair: realPair, 
-        bias: realBias,
-        entry: realEntry,      // Sends the actual number!
-        stop_loss: realSL,     
-        take_profit: realTP,   
+        pair: extractValue(analysis, "PAIR") || "XAU/USD", 
+        bias: extractValue(analysis, "BIAS") || "Neutral",
+        entry: realEntry !== "N/A" ? realEntry : "See Chart", 
+        stop_loss: realSL !== "N/A" ? realSL : "See Chart",
+        take_profit: realTP !== "N/A" ? realTP : "See Chart",
         analysis_text: analysis
     };
 
+    console.log("Sending Payload:", payload); // Debugging: Check console to see what is being sent
+
     try {
         await axios.post("https://chartwhisperer-pro.onrender.com/save", payload);
-        alert("✅ Sent Real Numbers to Telegram!");
+        alert(`✅ Sent to Telegram!\nEntry: ${payload.entry}\nTP: ${payload.take_profit}`);
     } catch (error) {
         console.error(error);
-        alert("❌ Failed to save.");
+        alert("❌ Failed to save. Check the Console (F12) for the exact error.");
     } finally {
         setSaving(false);
     }
