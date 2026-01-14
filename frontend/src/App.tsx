@@ -6,7 +6,7 @@ import ReactMarkdown from 'react-markdown';
 function App() {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
-  const [strategy, setStrategy] = useState<string>("Look for a Liquidity Sweep of the Asian High/Low, then a Change of Character (CHoCH) on the 5m timeframe. Entry on the Fair Value Gap.");
+  const [strategy, setStrategy] = useState<string>("Give me some setup");
   const [analysis, setAnalysis] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [saving, setSaving] = useState<boolean>(false);
