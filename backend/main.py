@@ -49,7 +49,7 @@ def send_telegram_alert(entry: JournalEntry):
         f"📉 <b>Pair:</b> {entry.pair}\n"
         f"🐂/🐻 <b>Bias:</b> {entry.bias}\n"
         f"💰 <b>Entry:</b> {entry.entry}\n"
-        f"🛑 <b>Stop Loss:</b> {entry.stop_loss[int]}\n"
+        f"🛑 <b>Stop Loss:</b> {entry.stop_loss}\n"
         f"🎯 <b>Take Profit:</b> {entry.take_profit}\n\n"
         f"<i>Check ChartWhisperer for full analysis.</i>"
     )
