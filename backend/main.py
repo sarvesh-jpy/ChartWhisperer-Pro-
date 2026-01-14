@@ -81,7 +81,8 @@ async def analyze_chart(
     
     MY STRATEGY RULES:
     "{strategy}"
-    
+
+    Give me a BOS structure trend and matches with my support and resistance 
     If the chart matches my rules, provide the output in this EXACT format (so I can parse it):
     PAIR: [Asset Name]
     BIAS: [Bullish/Bearish]
