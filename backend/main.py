@@ -35,7 +35,7 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY) if SUPABASE_URL els
 class JournalEntry(BaseModel):
     pair: str
     bias: str
-    entry: str
+    entry: int
     stop_loss: int
     take_profit: int
     analysis_text: str
